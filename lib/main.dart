@@ -39,34 +39,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String pathPDF = "";
-  String landscapePathPdf = "";
-  String remotePDFpath = "";
-  String corruptedPathPDF = "";
+  String pathPDF = "assets/flutter-succinctly.pdf";
+  String remotePathPDF =
+      "https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf";
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    fromAsset('assets/corrupted.pdf', 'corrupted.pdf').then((f) {
-      setState(() {
-        corruptedPathPDF = f.path;
-      });
-    });
-    fromAsset('assets/demo-link.pdf', 'demo.pdf').then((f) {
+    fromAsset('assets/flutter-succinctly.pdf', 'demo.pdf').then((f) {
       setState(() {
         pathPDF = f.path;
       });
     });
-    fromAsset('assets/demo-landscape.pdf', 'landscape.pdf').then((f) {
-      setState(() {
-        landscapePathPdf = f.path;
-      });
-    });
-
     createFileOfPdfUrl().then((f) {
       setState(() {
-        remotePDFpath = f.path;
+        remotePathPDF = f.path;
       });
     });
   }
@@ -77,22 +65,13 @@ class _MyHomePageState extends State<MyHomePage> {
       print("Start download file from internet!");
     }
     try {
-      // "https://berlin2017.droidcon.cod.newthinking.net/sites/global.droidcon.cod.newthinking.net/files/media/documents/Flutter%20-%2060FPS%20UI%20of%20the%20future%20%20-%20DroidconDE%2017.pdf";
-      // final url = "https://pdfkit.org/docs/guide.pdf";
-      const url =
-          "https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf";
-      final filename = url.substring(url.lastIndexOf("/") + 1);
+      final url = remotePathPDF;
+      final fileName = url.substring(url.lastIndexOf('/') + 1);
       var request = await HttpClient().getUrl(Uri.parse(url));
       var response = await request.close();
       var bytes = await consolidateHttpClientResponseBytes(response);
       var dir = await getApplicationDocumentsDirectory();
-      if (kDebugMode) {
-        print("Download files");
-        print("${dir.path}/$filename");
-      }
-
-      File file = File("${dir.path}/$filename");
-
+      File file = File('${dir.path}/$fileName');
       await file.writeAsBytes(bytes, flush: true);
       completer.complete(file);
     } catch (e) {
@@ -124,66 +103,42 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Plugin example app')),
-      body: Center(child: Builder(
-        builder: (BuildContext context) {
-          return Column(
-            children: <Widget>[
-              TextButton(
-                child: const Text("Open PDF"),
-                onPressed: () {
-                  if (pathPDF.isNotEmpty) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PDFScreen(path: pathPDF),
-                      ),
-                    );
-                  }
-                },
-              ),
-              TextButton(
-                child: const Text("Open Landscape PDF"),
-                onPressed: () {
-                  if (landscapePathPdf.isNotEmpty) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PDFScreen(path: landscapePathPdf),
-                      ),
-                    );
-                  }
-                },
-              ),
-              TextButton(
-                child: const Text("Remote PDF"),
-                onPressed: () {
-                  if (remotePDFpath.isNotEmpty) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PDFScreen(path: remotePDFpath),
-                      ),
-                    );
-                  }
-                },
-              ),
-              TextButton(
-                child: const Text("Open Corrupted PDF"),
-                onPressed: () {
-                  if (pathPDF.isNotEmpty) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PDFScreen(path: corruptedPathPDF),
-                      ),
-                    );
-                  }
-                },
-              )
-            ],
-          );
-        },
-      )),
+      body: Center(
+        child: Builder(
+          builder: (BuildContext context) {
+            return Column(
+              children: <Widget>[
+                TextButton(
+                  child: const Text("Open PDF"),
+                  onPressed: () {
+                    if (pathPDF.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PDFScreen(path: pathPDF),
+                        ),
+                      );
+                    }
+                  },
+                ),
+                TextButton(
+                  child: const Text("Open Remote PDF"),
+                  onPressed: () {
+                    if (pathPDF.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PDFScreen(path: remotePathPDF),
+                        ),
+                      );
+                    }
+                  },
+                )
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 }
